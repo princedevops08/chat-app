@@ -25,7 +25,8 @@ io.adapter(createAdapter(pubClient, subClient));
 
 // Health
 app.get("/health", (req, res) => {
-  res.status(200).send("OK");
+    res.setHeader("X-Pod-Name", process.env.HOSTNAME);
+    res.status(200).send("OK");
 });
 
 io.on("connection", async (socket) => {

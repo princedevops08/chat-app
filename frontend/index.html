@@ -5,27 +5,43 @@
 </head>
 <body>
   <h2>Real-Time Chat</h2>
+
   <ul id="messages"></ul>
+
   <input id="input" autocomplete="off" placeholder="Type message here..." />
   <button onclick="sendMessage()">Send</button>
 
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <script>
-    const BACKEND_URL = "http://13.233.91.86:30007"; // change later via env
 
-    const socket = io(BACKEND_URL);
+  <script>
+    // Auto-connect to same domain (HTTPS safe)
+    const socket = io({
+      transports: ["websocket"],
+      secure: true
+    });
 
     const messages = document.getElementById("messages");
     const input = document.getElementById("input");
 
+    // Load old messages (from MongoDB)
+    socket.on("init messages", (msgs) => {
+      msgs.forEach(msg => {
+        const li = document.createElement("li");
+        li.textContent = msg.text || msg;
+        messages.appendChild(li);
+      });
+    });
+
+    // New incoming message
     socket.on("chat message", (msg) => {
       const li = document.createElement("li");
       li.textContent = msg;
       messages.appendChild(li);
     });
 
+    // Send message
     function sendMessage() {
-      if (input.value) {
+      if (input.value.trim() !== "") {
         socket.emit("chat message", input.value);
         input.value = "";
       }

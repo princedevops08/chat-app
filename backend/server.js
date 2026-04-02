@@ -15,7 +15,9 @@ connectDB();
 const io = new Server(server, {
   cors: {
     origin: "*"
+    method: ["GET", "POST"]
   }
+   transports: ["websocket"]
 });
 
 // Redis adapter
